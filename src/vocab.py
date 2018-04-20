@@ -1,3 +1,5 @@
+#! /usr/bin/python2.7
+
 class Vocab:
     def __init__(self):
         self.words = open('data/vocabs.word', 'r').read().strip().split('\n')

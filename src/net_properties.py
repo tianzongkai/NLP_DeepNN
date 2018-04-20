@@ -1,3 +1,5 @@
+#! /usr/bin/python2.7
+
 class NetProperties:
     def __init__(self, word_embed_dim, pos_embed_dim, label_embed_dim, hidden1_dim, hidden2_dim, minibatch_size):
         self.word_embed_dim = word_embed_dim

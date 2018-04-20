@@ -1,3 +1,6 @@
+#! /usr/bin/python2.7
+
+
 import dynet as dynet
 import random
 import matplotlib.pyplot as plt
