@@ -22,6 +22,10 @@ class Network:
 
         # assign transfer function
         self.transfer = dynet.rectify  # can be dynet.logistic or dynet.tanh as well.
+        # self.transfer = dynet.tanh
+
+        # assign softmax function for output layer
+        self.softmax_transfer = dynet.softmax
 
         # define the input dimension for the embedding layer.
         # word features: 20 types of word features
@@ -71,7 +75,7 @@ class Network:
         hidden1_layer = self.transfer(self.hidden1_layer.expr() * embedding_layer + self.hidden1_layer_bias.expr())
         hidden2_layer = self.transfer(self.hidden2_layer.expr() * hidden1_layer + self.hidden2_layer_bias.expr())
 
-        # calculating the output layer
+        # calculating the output layer l = V * h2 + r
         output = self.output_layer.expr() * hidden2_layer + self.output_bias.expr()
 
         # return the output as a dynet vector (expression)
@@ -104,6 +108,8 @@ class Network:
                 result = self.build_graph(features)
 
                 # getting loss with respect to negative log softmax function and the gold action.
+                # loss = -dynet.sum_elems(dynet.log(self.softmax_transfer(result)))
+
                 loss = dynet.pickneglogsoftmax(result, gold_action_idx)
 
                 # appending to the minibatch losses
@@ -145,31 +151,6 @@ class Network:
             # there are still some minibatch items in the memory but they are smaller than the minibatch size
             # so we ask dynet to forget them
             dynet.renew_cg()
-
-    def decode(self, words):
-        # first putting two start symbols
-        words = ['<s>', '<s>'] + words + ['</s>', '</s>']
-        tags = ['<s>', '<s>']
-
-        for i in range(2, len(words) - 2):
-            features = words[i - 2:i + 3] + tags[i - 2:i]
-
-            # running forward
-            output = self.build_graph(features)
-
-            # getting list value of the output
-            scores = output.npvalue()
-
-            # getting best tag
-            best_tag_id = np.argmax(scores)
-
-            # assigning the best tag
-            tags.append(self.vocab.tagid2tag_str(best_tag_id))
-
-            # refresh dynet memory (computation graph)
-            dynet.renew_cg()
-
-        return tags[2:]
 
     def load(self, filename):
         self.model.populate(filename)

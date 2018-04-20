@@ -42,7 +42,7 @@ class Vocab:
         return self.word_vocab.index(word) if word in self.word_vocab else self.word_vocab.index('<unk>')
 
     def pos2id(self, tag):
-        return self.pos_vocab.index(tag)
+        return self.pos_vocab.index(tag) if tag in self.pos_vocab else self.pos_vocab.index('<null>')
 
     def label2id(self, label):
         return self.label_vocab.index(label)
